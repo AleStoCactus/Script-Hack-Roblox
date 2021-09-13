@@ -1,0 +1,1 @@
+loadstring(game:HttpGetAsync("https://raw.githubusercontent.com/BrokenScript2/admin-prison-life/main/adminprisonlife.txt))()

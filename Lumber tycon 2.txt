@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/MrFrostyV2/FrostyX.Wtf.com/main/FrostyX.like.boys"))()

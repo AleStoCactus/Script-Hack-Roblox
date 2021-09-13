@@ -1,0 +1,1 @@
+loadstring(game:HttpGet("https://raw.githubusercontent.com/ProtonDev-sys/Roblox/main/Vesteria%20V2%20rewrite.lua"))()

@@ -1,0 +1,182 @@
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local InfAmmo = Instance.new("TextButton")
+local AutoFarm = Instance.new("TextButton")
+local TextLabel = Instance.new("TextLabel")
+local TextLabel_2 = Instance.new("TextLabel")
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+Frame.Parent = ScreenGui
+Frame.BackgroundColor3 = Color3.fromRGB(86, 90, 3)
+Frame.Position = UDim2.new(0.702471495, 0, 0.104037255, 0)
+Frame.Size = UDim2.new(0, 186, 0, 254)
+
+InfAmmo.Name = "InfAmmo"
+InfAmmo.Parent = Frame
+InfAmmo.BackgroundColor3 = Color3.fromRGB(148, 148, 50)
+InfAmmo.Position = UDim2.new(-0.00023508817, 0, 0.109306976, 0)
+InfAmmo.Size = UDim2.new(0, 186, 0, 89)
+InfAmmo.Font = Enum.Font.Arcade
+InfAmmo.Text = "Infinite Ammo"
+InfAmmo.TextColor3 = Color3.fromRGB(0, 0, 0)
+InfAmmo.TextSize = 14.000
+InfAmmo.MouseButton1Down:connect(function() 
+	local Tank
+	local Map
+	local LocalPlayer = game.Players.LocalPlayer
+
+	-- LocalPlayer.Character is nil and I cant find where the tank is connected to the player so I had to do all this shit
+	local function search(map)
+		for i,v in pairs(map:GetChildren()) do
+			if v.ClassName == 'Model' and v:FindFirstChild('Seat') and 2 > (game.Workspace[LocalPlayer.Name].HumanoidRootPart.Position - v.Seat.Position).Magnitude then
+				Tank = v
+				Map = map
+				return
+			end
+		end
+	end
+
+	local function set()
+		for i,v in pairs(game.Workspace:GetChildren()) do
+			if v.ClassName == 'Folder' and v.Name ~= '[DeathEffects]' then
+				search(v)
+			end
+		end
+	end
+	set()
+
+	game.Workspace.ChildAdded:Connect(
+		function(c)
+			if c.Name == LocalPlayer.Name then
+				wait(1)
+				set()
+			end
+		end
+	)
+
+	LocalPlayer.PlayerGui.Ammo.Frame.Value:GetPropertyChangedSignal("Text"):Connect(
+	function()
+		if Tank then
+			wait()
+			firetouchinterest(Tank['CollisionBox char'], Map.Reload, 0)
+			wait()
+			firetouchinterest(Tank['CollisionBox char'], Map.Reload, 1)
+		end
+	end
+	)
+end)
+
+
+AutoFarm.Name = "AutoFarm"
+AutoFarm.Parent = Frame
+AutoFarm.BackgroundColor3 = Color3.fromRGB(148, 148, 50)
+AutoFarm.Position = UDim2.new(-0.00023508817, 0, 0.538440824, 0)
+AutoFarm.Size = UDim2.new(0, 186, 0, 89)
+AutoFarm.Font = Enum.Font.Arcade
+AutoFarm.Text = "AutoFarm"
+AutoFarm.TextColor3 = Color3.fromRGB(0, 0, 0)
+AutoFarm.TextSize = 14.000
+AutoFarm.MouseButton1Down:connect(function()
+	local Tank
+	local Map
+	local OMap
+	local Players = game.Players
+	local LocalPlayer = Players.LocalPlayer
+
+
+	local function search(map)
+		for i,v in pairs(map:GetChildren()) do
+			if v.ClassName == 'Model' and v:FindFirstChild('Seat') and 2 > (game.Workspace[LocalPlayer.Name].HumanoidRootPart.Position - v.Seat.Position).Magnitude then -- LocalPlayer.Character is nil
+				Tank = v
+				Map = map
+				if OMap == nil then
+					OMap = map.Name
+				end
+			end
+		end
+	end
+
+	for i,v in pairs(game:GetService("ReplicatedStorage")["RemoteEvents Folder"]:GetChildren()) do
+		v.Name = i
+	end
+
+	for i,v in pairs(game:GetService("ReplicatedStorage")["RemoteFunctions Folder"]:GetChildren()) do
+		v.Name = i
+	end
+
+	local function set()
+		for i,v in pairs(game.Workspace:GetChildren()) do
+			if v.ClassName == 'Folder' and v.Name ~= '[DeathEffects]' then
+				search(v)
+				return
+			end
+		end
+	end
+	set()
+
+	game.Workspace.ChildAdded:Connect(
+		function(c)
+			if c.Name == LocalPlayer.Name then
+				wait()
+				Char = c
+				set()
+			end
+		end
+	)
+
+	local function destroyAll()
+		for i,model in pairs(Map:GetChildren()) do
+			if model.ClassName == 'Model' and not model:FindFirstChild('Hull') then
+				for i,v in pairs(model:GetDescendants()) do
+					if v.ClassName == 'TouchTransmitter' then
+						spawn(function()
+							while v.Parent do
+								firetouchinterest(Tank.BUMPER, v.Parent, 0)
+								wait()
+								if v.Parent then
+									firetouchinterest(Tank.BUMPER, v.Parent, 1)
+								end
+							end
+						end)
+					end
+				end
+			end
+		end
+	end
+
+	if Map.Name ~= 'MapOne' then
+		while true do
+			wait(3)
+			destroyAll()
+			wait(5)
+			game:GetService("ReplicatedStorage")["RemoteFunctions Folder"]['8']:InvokeServer('MapOne')
+			wait()
+			game:GetService("ReplicatedStorage")["RemoteFunctions Folder"]['8']:InvokeServer(OMap)
+		end
+	end
+
+	while wait(5) do
+		destroyAll()
+	end
+end)
+
+TextLabel.Parent = Frame
+TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.BackgroundTransparency = 1.000
+TextLabel.Position = UDim2.new(0.00537634408, 0, 0, 0)
+TextLabel.Size = UDim2.new(0, 185, 0, 21)
+TextLabel.Font = Enum.Font.SciFi
+TextLabel.Text = "Made by: Vladyx "
+TextLabel.TextColor3 = Color3.fromRGB(255, 206, 206)
+TextLabel.TextSize = 14.000
+
+TextLabel_2.Parent = Frame
+TextLabel_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel_2.BackgroundTransparency = 1.000
+TextLabel_2.Position = UDim2.new(-0.00537634408, 0, 0.917322814, 0)
+TextLabel_2.Size = UDim2.new(0, 185, 0, 21)
+TextLabel_2.Font = Enum.Font.SciFi
+TextLabel_2.Text = "Scripts by: snake587"
+TextLabel_2.TextColor3 = Color3.fromRGB(255, 206, 206)
+TextLabel_2.TextSize = 14.000
